@@ -1,0 +1,197 @@
+{% extends 'accounting/base.html' %}
+
+{% block head %}
+    <title>Forgot password</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+{% endblock %}
+
+{% block form %}
+    <div class="ui blue progress" data-value="1" data-total="3" id="progress">
+        <div class="bar">
+            <div class="progress"></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+
+        <div id="tab1" class="mmd-tab">
+            <h1>Reset password</h1>
+            <form action="/" method="post">
+                <div class="field-wrap">
+                    <label>
+                        Email<span class="req">*</span>
+                    </label>
+                    <input type="email" required autocomplete="on"/>
+                    <br>
+                    <br>
+                    <label>We will send an authentication code to your email.</label>
+                    <br>
+                </div>
+            </form>
+        </div>
+
+        <div id="tab2" class="mmd-tab">
+            <h1>Authentication code</h1>
+            <form action="/" method="post">
+                <div class="field-wrap">
+                    <label>
+                        Code<span class="req">*</span>
+                    </label>
+                    <input type="email" required autocomplete="off"/>
+                    <br>
+                    <br>
+                    <label>We sent an authentication code to your email.</label>
+                    <br>
+                    <br>
+                    <label>Enter the sent code</label>
+                    <br>
+                </div>
+            </form>
+        </div>
+
+        <div id="tab3" class="mmd-tab">
+            <h1>New password</h1>
+
+            <form action="/" method="post">
+
+                <div class="field-wrap">
+                    <label>
+                        Password<span class="req">*</span>
+                    </label>
+                    <input type="password" required autocomplete="off"/>
+                </div>
+
+                <div class="field-wrap">
+                    <label>
+                        Confirm password<span class="req">*</span>
+                    </label>
+                    <input type="password" required autocomplete="off"/>
+                    <br>
+                    <br>
+                    <label>Enter new password.</label>
+                    <br>
+                </div>
+                <button type="submit" class="button button-block"/>
+                Change password</button>
+
+
+            </form>
+        </div>
+
+
+    </div><!-- tab-content -->
+
+    <br>
+    <br>
+    <ul class="tab-group">
+        <li class="tab" id="left"><a href="#"><i class="arrow left icon large"></i> &nbsp; &nbsp; Back</a></li>
+        <li class="tab" id="right"><a href="#">Next &nbsp; &nbsp;<i class="arrow right icon large"></i></a></li>
+    </ul>
+
+
+
+
+
+    <script>
+        $('.form').find('input, textarea').on('keyup blur focus', function (e) {
+
+            var $this = $(this),
+                label = $this.prev('label');
+
+            if (e.type === 'keyup') {
+                if ($this.val() === '') {
+                    label.removeClass('active highlight');
+                } else {
+                    label.addClass('active highlight');
+                }
+            } else if (e.type === 'blur') {
+                if ($this.val() === '') {
+                    label.removeClass('active highlight');
+                } else {
+                    label.removeClass('highlight');
+                }
+            } else if (e.type === 'focus') {
+
+                if ($this.val() === '') {
+                    label.removeClass('highlight');
+                } else if ($this.val() !== '') {
+                    label.addClass('highlight');
+                }
+            }
+
+        });
+
+        $('#login').hide();
+        $('#signup').hide();
+        $('#email').fadeIn();
+    </script>
+
+    <script>
+        $('#progress').progress({
+                total: 3,
+                label: 'ratio',
+                text: {
+                    ratio: '{value} of {total}'
+                }
+            }
+        );
+
+        let set_tab = function () {
+            for (let i = 1; i < 4; i++) {
+                $('.mmd-tab').hide();
+                $('#tab' + tab).fadeIn();
+            }
+        };
+
+
+        let go_right = function () {
+            if (tab == 3) {
+                return;
+            }
+            $('#progress').progress('increment');
+            if (tab == 2) {
+                $('#right > a').css('visibility', 'hidden');
+                $('#right').prop('disabled', true);
+            }
+            if (tab == 1) {
+                $('#left > a').css('visibility', 'visible');
+                $('#left').prop('disabled', false);
+            }
+            tab++;
+            set_tab();
+        };
+
+        let go_left = function () {
+            if (tab == 1) {
+                return;
+            }
+            $('#progress').progress('decrement');
+            if (tab == 2) {
+                $('#left > a').css('visibility', 'hidden');
+                $('#left').prop('disabled', true);
+            }
+            if (tab == 3) {
+                $('#right > a').css('visibility', 'visible');
+                $('#right').prop('disabled', false);
+            }
+            tab--;
+            set_tab();
+        };
+
+
+        $('#right').click(go_right);
+        $('#left').click(go_left);
+
+        var tab = 1;
+        set_tab();
+        $('#left > a').css('visibility', 'hidden');
+        $('#left').prop('disabled', true);
+
+
+    </script>
+
+
+{% endblock %}

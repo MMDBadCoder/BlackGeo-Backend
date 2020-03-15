@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'accounting/base/style.css' %}">
+    <link rel="stylesheet" href="{% static 'accounting/dynamic_background/style.css' %}">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+
+    {% block head %}
+    {% endblock %}
+
+
+</head>
+<body>
+<div id="particles-js" style="background-color: #2e2e6b"></div>
+
+<div class="vertical-container">
+    <div class="form-content form">
+        {% block form %}
+        {% endblock %}
+    </div>
+</div>
+
+</body>
+</html>
+
+<script src="{% static 'accounting/dynamic_background/min.js' %}"></script> <!-- stats.js lib -->
