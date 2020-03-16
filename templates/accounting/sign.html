@@ -13,21 +13,22 @@
         <div id="signup">
             <h1>Sign Up for Free</h1>
 
-            <form action="/" method="post">
+            <form id="signup">
+                {% csrf_token %}
 
                 <div class="top-row">
                     <div class="field-wrap">
                         <label>
                             First Name<span class="req">*</span>
                         </label>
-                        <input type="text" required autocomplete="off"/>
+                        <input type="text" required autocomplete="off" name="first_name" value="m"/>
                     </div>
 
                     <div class="field-wrap">
                         <label>
                             Last Name<span class="req">*</span>
                         </label>
-                        <input type="text" required autocomplete="off"/>
+                        <input type="text" required autocomplete="off" name="last_name" value="h"/>
                     </div>
                 </div>
 
@@ -35,14 +36,21 @@
                     <label>
                         Email Address<span class="req">*</span>
                     </label>
-                    <input type="email" required autocomplete="off"/>
+                    <input type="email" required autocomplete="off" name="email" value="a@a.com"/>
                 </div>
 
                 <div class="field-wrap">
                     <label>
                         Set A Password<span class="req">*</span>
                     </label>
-                    <input type="password" required autocomplete="off"/>
+                    <input type="password" required autocomplete="off" name="password1" value="1"/>
+                </div>
+
+                <div class="field-wrap">
+                    <label>
+                        Confirm Password<span class="req">*</span>
+                    </label>
+                    <input type="password" required autocomplete="off" name="password2" value="2"/>
                 </div>
 
                 <button type="submit" class="button button-block"/>
@@ -55,20 +63,22 @@
         <div id="login">
             <h1>Welcome Back!</h1>
 
-            <form action="/" method="post">
+            <form action="/" method="post" id="login">
+
+                {% csrf_token %}
 
                 <div class="field-wrap">
                     <label>
                         Email Address<span class="req">*</span>
                     </label>
-                    <input type="email" required autocomplete="off"/>
+                    <input type="email" required autocomplete="off" name="email"/>
                 </div>
 
                 <div class="field-wrap">
                     <label>
                         Password<span class="req">*</span>
                     </label>
-                    <input type="password" required autocomplete="off"/>
+                    <input type="password" required autocomplete="off" name="password"/>
                 </div>
 
                 <p class="forgot"><a href="{% url 'forgot' %}">Forgot Password?</a></p>
@@ -134,6 +144,99 @@
         var tab = $(jQueryText);
         tab.click();
     </script>
+
+    <script>
+
+        function signup() {
+            var object = {};
+            formData = new FormData(document.forms['signup']);
+            formData.forEach(function (value, key) {
+                object[key] = value;
+                if (key === 'email') {
+                    object['username'] = value;
+                }
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'signup' %}',
+                data: object,
+                success: function (json) {
+
+                    Swal.fire({
+                        title: 'Your registration was successful.',
+                        text: "Now you can log in with your account.",
+                        icon: 'success',
+                        confirmButtonColor: '#41d639',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                    });
+
+                },
+                error: function (xhr, errmsg, err) {
+                    let text = xhr.responseText;
+                    let html = '<div class="ajax-sweet-alert-error">' + text + '</div>';
+                    let title = 'Incomplete information';
+                    if (text === undefined) {
+                        title = 'No connection';
+                    }
+                    Swal.fire(
+                        title,
+                        html,
+                        'error'
+                    );
+                }
+            });
+        }
+
+        $("#signup").submit(function (e) {
+            signup();
+            e.preventDefault();
+        });
+    </script>
+
+
+
+    <script>
+
+        function login() {
+            var object = {};
+            formData = new FormData(document.forms['login']);
+            formData.forEach(function (value, key) {
+                object[key] = value;
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'login' %}',
+                data: object,
+                success: function (data, textStatus, jqXHR) {
+                    let home_address = location.origin + '{% url 'home' %}';
+                    location.replace(home_address);
+                },
+                error: function (xhr, errmsg, err) {
+
+                    let text = xhr.responseText;
+                    let title = 'Incomplete information';
+                    if (text === undefined) {
+                        title = 'No connection';
+                    }
+                    Swal.fire(
+                        title,
+                        text,
+                        'error'
+                    );
+                }
+            });
+        }
+
+        $("#login").submit(function (e) {
+            login();
+            e.preventDefault();
+        });
+    </script>
 {% endblock %}
+
 
 

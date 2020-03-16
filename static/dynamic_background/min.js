@@ -447,7 +447,7 @@ function init() {
                     "image": {"src": "img/github.svg", "width": 100, "height": 100}
                 },
                 "opacity": {
-                    "value": 1,
+                    "value": 0.7,
                     "random": false,
                     "anim": {"enable": false, "speed": 1, "opacity_min": 0.1, "sync": false}
                 },
@@ -456,7 +456,7 @@ function init() {
                     "random": true,
                     "anim": {"enable": false, "speed": 40, "size_min": 0.1, "sync": false}
                 },
-                "line_linked": {"enable": true, "distance": 150, "color": "#aceaf9", "opacity": 0.9, "width": 1},
+                "line_linked": {"enable": true, "distance": 150, "color": "#aceaf9", "opacity": 0.7, "width": 1},
                 "move": {
                     "enable": true,
                     "speed": 6,

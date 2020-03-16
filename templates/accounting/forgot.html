@@ -2,9 +2,11 @@
 
 {% block head %}
     <title>Forgot password</title>
+
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
 
 {% endblock %}
 
@@ -17,30 +19,46 @@
 
     <div class="tab-content">
 
+        <div id="loading-tab">
+            <div class="ui active centered inline loader massive"></div>
+        </div>
+
         <div id="tab1" class="mmd-tab">
             <h1>Reset password</h1>
-            <form action="/" method="post">
+            <form id="email-form">
+                {% csrf_token %}
                 <div class="field-wrap">
                     <label>
                         Email<span class="req">*</span>
                     </label>
-                    <input type="email" required autocomplete="on"/>
+                    <input type="email" required autocomplete="on" name="email"/>
                     <br>
                     <br>
                     <label>We will send an authentication code to your email.</label>
                     <br>
                 </div>
+                <input type="submit" hidden id="tab1-submit"/>
+                <ul class="tab-group">
+                    <li class="tab" id="tab1-left" style="visibility: hidden"><a href="#"><i
+                            class="arrow left icon large"></i></a>
+                    </li>
+                    <li class="tab" id="tab2-right" onclick="$('#tab1-submit').click()"><a href="#">Next &nbsp; &nbsp;<i
+                            class="arrow right icon large"></i></a>
+                    </li>
+                </ul>
             </form>
+
         </div>
 
         <div id="tab2" class="mmd-tab">
             <h1>Authentication code</h1>
-            <form action="/" method="post">
+            <form id="code-form">
+                {% csrf_token %}
                 <div class="field-wrap">
                     <label>
                         Code<span class="req">*</span>
                     </label>
-                    <input type="email" required autocomplete="off"/>
+                    <input type="number" required autocomplete="off" name="code"/>
                     <br>
                     <br>
                     <label>We sent an authentication code to your email.</label>
@@ -49,48 +67,53 @@
                     <label>Enter the sent code</label>
                     <br>
                 </div>
+                <input type="submit" hidden id="tab2-submit"/>
+                <ul class="tab-group">
+                    <li class="tab" id="tab2-left"><a href="#"><i class="arrow left icon large"></i> &nbsp; &nbsp; Back</a>
+                    </li>
+                    <li class="tab" id="tab2-right" onclick="$('#tab2-submit').click()"><a href="#">Next &nbsp; &nbsp;<i
+                            class="arrow right icon large"></i></a>
+                    </li>
+                </ul>
             </form>
         </div>
 
         <div id="tab3" class="mmd-tab">
             <h1>New password</h1>
 
-            <form action="/" method="post">
-
+            <form id="new-password-form">
+                {% csrf_token %}
                 <div class="field-wrap">
                     <label>
                         Password<span class="req">*</span>
                     </label>
-                    <input type="password" required autocomplete="off"/>
+                    <input type="password" required autocomplete="off" name="new_password1"/>
                 </div>
 
                 <div class="field-wrap">
                     <label>
                         Confirm password<span class="req">*</span>
                     </label>
-                    <input type="password" required autocomplete="off"/>
+                    <input type="password" required autocomplete="off" name="new_password2"/>
                     <br>
                     <br>
                     <label>Enter new password.</label>
                     <br>
                 </div>
-                <button type="submit" class="button button-block"/>
+                <button id="change-password" class="button button-block"/>
                 Change password</button>
-
-
+                <ul class="tab-group">
+                    <li class="tab" id="left"><a href="#"><i class="arrow left icon large"></i> &nbsp; &nbsp; Back</a>
+                    </li>
+                    <li class="tab" id="right" style="visibility: hidden"><a href="#"><i
+                            class="arrow right icon large"></i></a>
+                    </li>
+                </ul>
             </form>
         </div>
 
 
     </div><!-- tab-content -->
-
-    <br>
-    <br>
-    <ul class="tab-group">
-        <li class="tab" id="left"><a href="#"><i class="arrow left icon large"></i> &nbsp; &nbsp; Back</a></li>
-        <li class="tab" id="right"><a href="#">Next &nbsp; &nbsp;<i class="arrow right icon large"></i></a></li>
-    </ul>
-
 
 
 
@@ -123,13 +146,21 @@
             }
 
         });
+    </script>
 
-        $('#login').hide();
-        $('#signup').hide();
-        $('#email').fadeIn();
+
+
+
+    <script>
+        $('#tab2').hide();
+        $('#tab3').hide();
+
+        var tab = 1;
+        set_tab();
     </script>
 
     <script>
+
         $('#progress').progress({
                 total: 3,
                 label: 'ratio',
@@ -138,59 +169,215 @@
                 }
             }
         );
+    </script>
 
-        let set_tab = function () {
+    <script>
+        $('#email-form').submit(function (event) {
+            hide_current_tab();
+            loading_on();
+            try_send_email_to_backend();
+            event.preventDefault();
+        });
+
+        $('#code-form').submit(function (event) {
+            hide_current_tab();
+            loading_on();
+            try_send_code_to_backend();
+            event.preventDefault();
+        });
+
+        $('#new-password-form').submit(function (event) {
+            try_send_new_password();
+            event.preventDefault();
+        });
+
+        $('#tab2-left').click(function () {
+            go_left();
+        });
+
+        $('#tab3-left').click(function () {
+            go_left();
+        });
+
+
+    </script>
+
+
+
+
+    <script>
+
+        function set_tab() {
             for (let i = 1; i < 4; i++) {
                 $('.mmd-tab').hide();
                 $('#tab' + tab).fadeIn();
             }
-        };
+        }
 
-
-        let go_right = function () {
-            if (tab == 3) {
-                return;
-            }
-            $('#progress').progress('increment');
-            if (tab == 2) {
-                $('#right > a').css('visibility', 'hidden');
-                $('#right').prop('disabled', true);
-            }
-            if (tab == 1) {
-                $('#left > a').css('visibility', 'visible');
-                $('#left').prop('disabled', false);
-            }
-            tab++;
-            set_tab();
-        };
-
-        let go_left = function () {
-            if (tab == 1) {
+        function go_left() {
+            if (tab === 1) {
                 return;
             }
             $('#progress').progress('decrement');
-            if (tab == 2) {
+            if (tab === 2) {
                 $('#left > a').css('visibility', 'hidden');
                 $('#left').prop('disabled', true);
             }
-            if (tab == 3) {
+            if (tab === 3) {
                 $('#right > a').css('visibility', 'visible');
                 $('#right').prop('disabled', false);
             }
             tab--;
             set_tab();
-        };
+        }
 
+        function tab_plus() {
+            $('#progress').progress('increment');
+            if (tab === 2) {
+                $('#right > a').css('visibility', 'hidden');
+                $('#right').prop('disabled', true);
+            }
+            if (tab === 1) {
+                $('#left > a').css('visibility', 'visible');
+                $('#left').prop('disabled', false);
+            }
+            tab++;
+            set_tab();
+            loading_off();
+        }
 
-        $('#right').click(go_right);
-        $('#left').click(go_left);
+        function hide_current_tab() {
+            $('#tab' + tab).hide();
+        }
+    </script>
 
-        var tab = 1;
-        set_tab();
-        $('#left > a').css('visibility', 'hidden');
-        $('#left').prop('disabled', true);
+    <script>
+        function loading_on() {
+            $('#loading-tab').fadeIn();
+        }
 
+        function loading_off() {
+            $('#loading-tab').hide();
+        }
 
+        loading_off();
+    </script>
+
+    <script>
+        var user_data = {};
+    </script>
+
+    <script>
+        async function try_send_email_to_backend() {
+
+            formData = new FormData(document.forms['email-form']);
+            formData.forEach(function (value, key) {
+                user_data[key] = value;
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'send-email' %}',
+                data: user_data,
+                success: function (data, textStatus, jqXHR) {
+                    tab_plus();
+                },
+                error: function (xhr, errmsg, err) {
+                    let text = xhr.responseText;
+                    let title = 'Incorrect information';
+                    if (text === undefined) {
+                        title = 'No connection';
+                    }
+                    Swal.fire(
+                        title,
+                        text,
+                        'error'
+                    );
+                    set_tab();
+                    loading_off();
+                }
+            });
+        }
+    </script>
+
+    <script>
+        async function try_send_code_to_backend() {
+            formData = new FormData(document.forms['code-form']);
+            formData.forEach(function (value, key) {
+                user_data[key] = value;
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'check-authentication' %}',
+                data: user_data,
+                success: function (data, textStatus, jqXHR) {
+                    tab_plus();
+                },
+                error: function (xhr, errmsg, err) {
+                    let text = xhr.responseText;
+                    let title = 'Incorrect information';
+                    if (text === undefined) {
+                        title = 'No connection';
+                    }
+                    Swal.fire(
+                        title,
+                        text,
+                        'error'
+                    );
+                    set_tab();
+                    loading_off();
+                }
+            });
+        }
+    </script>
+
+    <script>
+
+        $('#change-password').click(function () {
+            try_send_new_password();
+        });
+
+        function try_send_new_password() {
+            formData = new FormData(document.forms['new-password-form']);
+            formData.forEach(function (value, key) {
+                user_data[key] = value;
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'new-password' %}',
+                data: user_data,
+                success: function (json) {
+
+                    Swal.fire({
+                        title: '',
+                        text: "Your password was changed successfully.",
+                        icon: 'success',
+                        confirmButtonColor: '#41d639',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        let login_address = location.origin + '{% url 'login' %}';
+                        location.replace(login_address);
+                    });
+
+                },
+                error: function (xhr, errmsg, err) {
+                    let text = xhr.responseText;
+                    let html = '<div class="ajax-sweet-alert-error">' + text + '</div>';
+                    let title = 'Incomplete information';
+                    if (text === undefined) {
+                        title = 'No connection';
+                    }
+                    Swal.fire(
+                        title,
+                        html,
+                        'error'
+                    );
+                }
+            });
+        }
     </script>
 
 

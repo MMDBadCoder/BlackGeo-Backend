@@ -26,10 +26,6 @@
 }
 
 
-
-
-
-
 *, *:before, *:after {
     box-sizing: border-box;
 }
@@ -43,9 +39,9 @@ body {
     font-family: 'Titillium Web', sans-serif;
 }
 
-a {
+.vertical-container a {
     text-decoration: none;
-    color: #1769b3b8;
+    color: rgba(67, 168, 179, 0.72);
     -webkit-transition: .5s ease;
     transition: .5s ease;
 }
@@ -66,7 +62,9 @@ a:hover {
 .tab-group {
     list-style: none;
     padding: 0;
-    margin: 0 0 40px 0;
+    margin: 0;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .tab-group:after {
@@ -223,7 +221,7 @@ textarea {
     cursor: pointer;
 }
 
-.button-block:hover{
+.button-block:hover {
     background-color: #469ae6b8;
     color: #000069d4;
 }
