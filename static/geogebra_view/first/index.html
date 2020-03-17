@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <meta charset="utf-8" />
+
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+
+
+    <script src="./geogebra/geogebra.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="./menu/mini-menu.css" />
+    <link rel="stylesheet" type="text/css" href="./background.css" />
+    <link rel="stylesheet" type="text/css" href="./loading/loading.css" />
+    <link rel="stylesheet" type="text/css" href="./geogebra/style.css" />
+    <link rel="stylesheet" type="text/css" href="./top-navbar/style.css" />
+    <link rel="stylesheet" type="text/css" href="./question-window/style.css" />
+
+    <!-- semantic -->
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <script type="text/javascript" src="./question-window/min.js"></script>
+
+    <!-- sweet alert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <!-- select pure -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="./menu/select-pure/style.css" />
+    <script src="./menu/select-pure/bundle.min.js"></script>
+
+
+
+</head>
+
+
+<body class="screen">
+
+    <div class="screen" id='loading' style="z-index: 5;">
+        <div class="loader">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+    <script src="./loading/loading.js"></script>
+
+
+
+    <nav id="top-navbar">
+        <div class="left-part-top-navbar top-navbar-part">
+            <div class="top-navbar-icon">
+                <i class="question big icon"></i>
+            </div>
+            &nbsp;
+            &nbsp;
+            &nbsp;
+            <div class="top-navbar-icon">
+                <h4>No named yet</h4>
+            </div>
+        </div>
+        <div class="right-part-top-navbar top-navbar-part">
+            <div class="top-navbar-icon">
+                <i class="icon home big"></i>
+            </div>
+            <div class="top-navbar-icon">
+                <i class="icon check big"></i>
+            </div>
+            <div class="top-navbar-icon">
+                <i class="icon share big"></i>
+            </div>
+        </div>
+    </nav>
+
+
+
+    <div id="ggb-container"></div>
+    <script src="./geogebra/init.js"></script>
+
+
+    <div id="mini-menu-container">
+        <nav class="menu" id="mini-menu">
+            <input type="checkbox" href="#" class="menu-open" name="menu-open" id="menu-open" />
+            <label class="menu-open-button" for="menu-open">
+                <span class="lines line-1"></span>
+                <span class="lines line-2"></span>
+                <span class="lines line-3"></span>
+            </label>
+
+            <a href="#" class="menu-item blue-mini-menu"></a>
+            <a href="#" class="menu-item green-mini-menu"></a>
+            <a href="#" class="menu-item red-mini-menu"></a>
+            <a href="#" class="menu-item purple-mini-menu"></a>
+            <a href="#" class="menu-item orange-mini-menu"></a>
+            <a href="#" class="menu-item lightblue-mini-menu"></a>
+        </nav>
+
+    </div>
+    <script src="./menu/menu.js"></script>
+
+
+
+
+    <div id="question_box" style="  z-index: 3;">
+        <div class="ui card" id="question-card" style="height: fit-content;">
+            <div style="padding: 10px;">
+                <i class="plus bordered large icon" id="question-size-plus"></i>
+                <i class="minus bordered large icon" id="question-size-minus"></i>
+                <i class="close bordered large icon" id="question-close" style="float: right;"></i>
+                <div class="right floated meta" style="padding: 10px;">Problem 10</div>
+            </div>
+            <div class="image">
+                <img src="https://semantic-ui.com/images/wireframe/image.png">
+            </div>
+            <div class="content" hidden>
+                <span class="right floated">
+                    <i class="heart outline like icon"></i>
+                    17 likes
+                </span>
+                <i class="comment icon"></i>
+                3 comments
+            </div>
+            <div class="extra content" hidden>
+                <div class="ui large transparent left icon input">
+                    <i class="heart outline icon"></i>
+                    <input type="text" placeholder="Add Comment...">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./question-window/question.js"></script>
+
+
+
+</body>
+
+</html>
+
+
+<script src="./menu/teacher.js"></script>
+<script>
+    $(window).on("resize", function () {
+        window.location.reload();
+    });
+</script>

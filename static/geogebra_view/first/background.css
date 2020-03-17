@@ -1,0 +1,17 @@
+.screen {
+    padding: 0;
+    margin: 0;
+
+    z-index: -2;
+
+    z-index: -999;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-position: center;
+    background-size: cover
+}

@@ -1,0 +1,15 @@
+{% extends 'home/home.html' %}
+
+{% block home-head %}
+{% include 'sweetAlert/head.html' %}
+{% endblock %}
+
+{% block home-body %}
+
+    <div class="vertical-container">
+        <div class="form-content form">
+            {% block form %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
