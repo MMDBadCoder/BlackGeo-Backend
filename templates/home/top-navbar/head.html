@@ -1,0 +1,42 @@
+{#{% load static %}#}
+{#<link rel="stylesheet" href="{% static 'top-navbar/style.css' %}">#}
+
+<style>
+    #top-navbar {
+        background-color: #3457c185;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        height: 60px;
+        z-index: 1;
+    }
+
+    .top-navbar-part {
+        height: 100%;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .top-navbar-part > * {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .left-part-top-navbar {
+        float: left;
+    }
+
+    .right-part-top-navbar {
+        float: right;
+    }
+
+
+    .top-navbar-part > a {
+        color: white;
+        cursor: pointer;
+    }
+
+</style>
