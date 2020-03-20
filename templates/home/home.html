@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'home/home-base.html' %}
+
+{% block home-head %}
+    <title>Home</title>
+{% endblock %}
+
+{% block home-body %}
+
+    <div style="z-index: 10">
+        <br>
+        <br>
+        <br>
+        <a href="{% url 'sets:new' %}"><i class="plus massive green icon"></i></a>
+        <table class="ui five column table">
+            <tbody>
+            {% for set in sets %}
+                <tr>
+                    <td>{{ set.title }}</td>
+                    <td><a href="{% url 'sets:page' set.id %}"><i class="eye big white icon"></i></a></td>
+                    <td><a href="{% url 'sets:delete' set.id %}"><i class="cancel big white icon"></i></a></td>
+                    <td>Male</td>
+                    <td>None</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+{% endblock %}

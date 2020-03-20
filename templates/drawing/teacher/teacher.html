@@ -1,7 +1,401 @@
-{% extends 'drawing/drawing-base.html' %}
+{% include 'drawing/drawing-base.html' with problem=problem %}
 
-{% load static %}
+<script> //problem object
 
-{% block script %}
-    <script src="{% static 'geogebra_view/first/menu/teacher.js'%}"></script>
-{% endblock %}
+window.problem = {};
+window.problem.name = '{{ problem.name }}';
+window.problem.goals = JSON.parse('{{ problem.goals_elements | escapejs }}');
+window.problem.costs = JSON.parse('{{ problem.costs | escapejs}}');
+window.problem.base64 = '{{ problem.base64 }}';
+window.problem.description = '{{ problem.description | escapejs}}';
+
+</script>
+
+
+<script> // navbar
+$('#top-navbar-left').append('<i class="question big icon"></i>',
+    '<h3 id="name">{{ problem.name }}</h3>');
+
+$('#top-navbar-right').append(
+    '<i title="Save" class="save outline big icon" id="accept"></i>');
+</script>
+
+<script> //accept
+$('#accept').click(function () {
+    $.ajax({
+        type: 'POST',
+        url: '{% url 'drawing:set-details' problem.id %}',
+        data: {
+            goals: JSON.stringify(window.problem.goals),
+            costs: JSON.stringify(window.problem.costs),
+            name: window.problem.name,
+            description: window.problem.description,
+            base64: window.geogebra_api.getBase64(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        success: function (json) {
+            Swal.fire(
+                'Success!',
+                'Details was changed.',
+                'success'
+            );
+        },
+        error: function (xhr, errmsg, err) {
+            console.log(xhr);
+            console.log(errmsg);
+            console.log(err);
+            Swal.fire(
+                'Error!',
+                'Could not be changed.',
+                'error'
+            );
+        }
+    });
+
+});
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        function show_question() {
+            let card = $("#question-card");
+            card.show();
+            card.animate({left: "5px", top: "5px"});
+        }
+
+
+        //green
+        let green_item = $(".green-mini-menu");
+        icon = $('<i class="window maximize outline large icon"></i>');
+        green_item.append(icon);
+        green_item.prop("title", "Problem window");
+        green_item.click(show_question);
+    });
+</script>
+<script> //blue
+
+    $(document).ready(function () {
+        let blue_item = $(".blue-mini-menu");
+        address = location.origin + '{% url 'drawing:page-as-student' problem.id %}';
+        blue_item.click(function () {
+            window.open(address, '_blank');
+        });
+        icon = $('<i class="eye large icon"></i>');
+        blue_item.append(icon);
+        blue_item.prop("title", "Problem Page as student");
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+
+        //red
+        let red_item = $(".red-mini-menu");
+        icon = $('<i class="image large icon"></i>');
+        red_item.append(icon);
+        red_item.prop("title", "Set problem image");
+        red_item.click(async function () {
+            const {value: file} = await Swal.fire({
+                title: "Select image",
+                input: "file",
+                inputAttributes: {
+                    accept: "image/*",
+                    "aria-label": "Upload your profile picture"
+                }
+            });
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    Swal.fire({
+                        title: "Your uploaded picture",
+                        imageUrl: e.target.result,
+                        imageAlt: "The uploaded picture"
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        //purple
+        let purple_item = $(".purple-mini-menu");
+        icon = $('<i class="check circle large icon"></i>');
+        purple_item.append(icon);
+        purple_item.prop("title", "Goal elements");
+        purple_item.click(function () {
+            let names = window.geogebra_api.getAllObjectNames();
+            let options = [];
+            names.forEach(function (name, index) {
+                let definition = window.geogebra_api.getDefinitionString(name);
+                if (definition === "") {
+                    definition = window.geogebra_api.getObjectType(name);
+                }
+                let option = {
+                    label: name + " (" + definition + ")",
+                    value: name
+                };
+                options.push(option);
+            });
+
+            (async () => {
+                const {value: formValues} = await Swal.fire({
+                    title: "Pick goals elements",
+                    width: "80%",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    html: '<span class="multi-select-custom"></span>',
+                    onOpen: function () {
+                        var customIcon = document.createElement("img");
+                        {% load static %}
+                        customIcon.src = "{% static 'geogebra_view/first/menu/select-pure/icon.svg' %}";
+                        var customIconMulti = new SelectPure(".multi-select-custom", {
+                            options: options,
+                            value: window.problem.goals,
+                            multiple: true,
+                            inlineIcon: customIcon,
+                            autocomplete: true,
+                            onChange: value => {
+                                console.log(value);
+                                window.geogebra_api.setGoalObjects(value);
+                            },
+                            classNames: {
+                                select: "select-pure__select",
+                                dropdownShown: "select-pure__select--opened",
+                                multiselect: "select-pure__select--multiple",
+                                label: "select-pure__label",
+                                placeholder: "select-pure__placeholder",
+                                dropdown: "select-pure__options",
+                                option: "select-pure__option",
+                                autocompleteInput: "select-pure__autocomplete",
+                                selectedLabel: "select-pure__selected-label",
+                                selectedOption: "select-pure__option--selected",
+                                placeholderHidden: "select-pure__placeholder--hidden",
+                                optionHidden: "select-pure__option--hidden"
+                            }
+                        });
+                    },
+                    focusConfirm: false,
+                    preConfirm: () => {
+                    }
+                });
+            })();
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        //orange
+        let orange_item = $(".orange-mini-menu");
+        icon = $('<i class="align justify large icon"></i>');
+        orange_item.append(icon);
+        orange_item.prop("title", "Problem content and title");
+        orange_item.click(async function () {
+            const {value: description} = await Swal.fire({
+                title: 'Problem description',
+                input: 'textarea',
+                inputValue: window.problem.description,
+                inputPlaceholder: 'Type your message here...',
+                inputAttributes: {
+                    'aria-label': 'Type your message here'
+                },
+                showCancelButton: true
+            });
+
+
+            if (description) {
+                window.problem.description = description;
+                $('#description').text(description);
+            }
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        //lightblue
+        let lightblue_item = $(".lightblue-mini-menu");
+        icon = $('<i class="dollar sign large icon"></i>');
+        lightblue_item.append(icon);
+        lightblue_item.prop("title", "Pricing");
+
+        let form_html = "<br>";
+
+        let options = window.problem.costs;
+
+        options.forEach(function (option, index) {
+            let item = '<img class="cost-image" src="' + option.image_url + '">';
+            palceholder = option.name === 'reward' ? 'reward of reaching goals' : 'cost of each ' + option.name;
+            item +=
+                '<input placeholder="' + palceholder +
+                '" id="swal-' +
+                option.name +
+                '-input" value="' +
+                option.value +
+                '" class="swal2-input" type="number" style="max-width: 100%">';
+            form_html += item;
+        });
+        lightblue_item.click(async function () {
+            const {value: formValues} = await Swal.fire({
+                title: "Specify the cost of each element",
+                html: form_html,
+                focusConfirm: false,
+                preConfirm: () => {
+                    options.forEach(function (option, index) {
+                        let id = "swal-" + option.name + "-input";
+                        let value = document.getElementById(id).value;
+                        option.value = value;
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+<script> // geogebra_api functions and init
+
+function init_geogebra() {
+    let top_navbar_height = $("#top-navbar").height();
+    $("#ggb-container").css("padding-top", top_navbar_height);
+
+
+    var parameters = {
+        id: "app1",
+        prerelease: false,
+        showToolBar: true,
+        borderColor: "blue",
+        showMenuBar: false,
+        showAlgebraInput: false,
+        showResetIcon: true,
+        enableLabelDrags: false,
+        enableShiftDragZoom: true,
+        enableRightClick: true,
+        capturingThreshold: null,
+        showToolBarHelp: false,
+        useBrowserForJS: false,
+        showLogging: true,
+        enableCAS: false,
+        errorDialogsActive: false,
+        // customToolBar: '1|2',
+        ggbBase64: window.problem.base64
+    };
+
+    parameters.appletOnLoad = function (api) {
+        api.setGridVisible(false);
+        api.setAxesVisible(false, false);
+        window.geogebra_api = api;
+        teacher_features(api);
+    };
+
+    window.ggbApp = new GGBApplet(parameters);
+    ggbApp.inject("ggb-container");
+}
+
+function create_new_geogebra() {
+    if (document.readyState === "complete") {
+        init_geogebra();
+    } else {
+        window.addEventListener("load", function () {
+            init_geogebra();
+        });
+    }
+}
+
+// $(window).on("resize", function() {
+//   $("#ggb-element").remove();
+//   create_new_geogebra();
+// });
+
+create_new_geogebra();
+
+
+function teacher_features(api) {
+
+    api.normalColor = function () {
+        let names = api.getAllObjectNames();
+        names.forEach(function (name, index) {
+            api.setColor(name, 52, 100, 251);
+        });
+    };
+    api.normalColor();
+
+    api.setGoalObjects = function (goals) {
+        window.problem.goals = goals;
+        api.normalColor();
+        goals.forEach(function (name, index) {
+            api.setColor(name, 255, 0, 10);
+            api.setVisible(name, true);
+        });
+    };
+
+    api.setGoalObjects(window.problem.goals);
+
+
+    function renameListener(oldObjName, newObjName) {
+        if (window.problem.goals.includes(oldObjName)) {
+            window.problem.goals = window.problem.goals.filter(i => i !== oldObjName);
+            window.problem.goals.push(newObjName);
+        }
+    }
+
+    function removeListener(objName) {
+        if (window.problem.goals.includes(objName)) {
+            window.problem.goals = window.problem.goals.filter(i => i !== objName);
+        }
+    }
+
+    function addListener(objName) {
+        api.setColor(objName, 52, 100, 251);
+    }
+
+    function clickListener(objName) {
+        if (api.getMode() !== 0) {
+            return;
+        }
+        if (window.problem.goals.includes(objName)) {
+            removeListener(objName);
+        } else {
+            window.problem.goals.push(objName);
+        }
+        api.setGoalObjects(window.problem.goals);
+    }
+
+    api.registerClickListener(clickListener);
+    api.registerRemoveListener(removeListener);
+    api.registerAddListener(addListener);
+    api.registerRenameListener(renameListener);
+}
+</script>
+
+<script> //set name
+$('#name').click(async function () {
+    const inputValue = $('#name').text();
+
+    const {value: name} = await Swal.fire({
+        title: 'New name',
+        input: 'text',
+        inputValue: inputValue,
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value) {
+                return 'You need to write something!'
+            }
+        }
+    });
+
+    if (name) {
+        $('#name').text(name);
+        window.problem.name = name;
+    }
+})
+</script>

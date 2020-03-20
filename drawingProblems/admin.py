@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from drawingProblems.models import DrawingProblem
+
+
+@admin.register(DrawingProblem)
+class DrawingProblemAdmin(admin.ModelAdmin):
+    pass
+

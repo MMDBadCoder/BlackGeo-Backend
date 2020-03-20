@@ -14,24 +14,37 @@
     align-items: center;
     padding-left: 10px;
     padding-right: 10px;
+    width: fit-content;
 }
 
-.top-navbar-part>* {
+.top-navbar-part > * {
     margin-left: 5px;
     margin-right: 5px;
+    color: white;
+    cursor: pointer;
 }
 
-.left-part-top-navbar {
+#top-navbar-left {
     float: left;
 }
 
-.right-part-top-navbar {
+#top-navbar-right {
     float: right;
 }
-
 
 
 .top-navbar-icon {
     color: white;
     cursor: pointer;
+}
+
+
+.top-navbar-part > h3 {
+    text-align: center;
+    padding: 0;
+    height: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
 }

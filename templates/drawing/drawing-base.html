@@ -4,6 +4,7 @@
 <head>
     <meta name=viewport content="width=device-width,initial-scale=1">
     <meta charset="utf-8"/>
+    <title>{{ problem.name }}</title>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
 
     {#    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>#}
@@ -12,6 +13,7 @@
     {% load static %}
 
     <script src="{% static 'geogebra_view/first/geogebra/geogebra.js' %}"></script>
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
 
     <link rel="stylesheet" type="text/css" href="{% static 'geogebra_view/first/menu/mini-menu.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'geogebra_view/first/background.css' %}"/>
@@ -19,6 +21,13 @@
     <link rel="stylesheet" type="text/css" href="{% static 'geogebra_view/first/geogebra/style.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'geogebra_view/first/top-navbar/style.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'geogebra_view/first/question-window/style.css' %}"/>
+
+    <style>
+        .cost-image{
+            width: 40px;
+            height: 40px;
+        }
+    </style>
 
     <!-- semantic -->
     <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script> -->
@@ -39,7 +48,7 @@
 </head>
 
 
-<body class="screen">
+<body class="screen" id="body">
 
 <div class="screen" id='loading' style="z-index: 5;">
     <div class="loader">
@@ -54,27 +63,9 @@
 
 
 <nav id="top-navbar">
-    <div class="left-part-top-navbar top-navbar-part">
-        <div class="top-navbar-icon">
-            <i class="question big icon"></i>
-        </div>
-        &nbsp;
-        &nbsp;
-        &nbsp;
-        <div class="top-navbar-icon">
-            <h4>No named yet</h4>
-        </div>
+    <div class="top-navbar-part" id="top-navbar-left">
     </div>
-    <div class="right-part-top-navbar top-navbar-part">
-        <div class="top-navbar-icon">
-            <i class="icon home big"></i>
-        </div>
-        <div class="top-navbar-icon">
-            <i class="icon check big"></i>
-        </div>
-        <div class="top-navbar-icon">
-            <i class="icon share big"></i>
-        </div>
+    <div class="top-navbar-part" id="top-navbar-right">
     </div>
 </nav>
 
@@ -92,7 +83,7 @@
             <span class="lines line-3"></span>
         </label>
 
-        <a href="#" class="menu-item blue-mini-menu"></a>
+        <a href="{% url 'drawing:page-as-student' problem.id %}" class="menu-item blue-mini-menu"></a>
         <a href="#" class="menu-item green-mini-menu"></a>
         <a href="#" class="menu-item red-mini-menu"></a>
         <a href="#" class="menu-item purple-mini-menu"></a>
@@ -110,11 +101,11 @@
             <i class="plus bordered large icon" id="question-size-plus"></i>
             <i class="minus bordered large icon" id="question-size-minus"></i>
             <i class="close bordered large icon" id="question-close" style="float: right;"></i>
-            <div class="right floated meta" style="padding: 10px;">Problem 10</div>
         </div>
         <div class="image">
             <img src="https://semantic-ui.com/images/wireframe/image.png">
         </div>
+        <p id="description">{{ problem.description }}</p>
         <div class="content" hidden>
                 <span class="right floated">
                     <i class="heart outline like icon"></i>
@@ -141,14 +132,6 @@
 </body>
 
 </html>
-
-
-<script>
-    $(window).on("resize", function () {
-        window.location.reload();
-    });
-</script>
-
 
 
 

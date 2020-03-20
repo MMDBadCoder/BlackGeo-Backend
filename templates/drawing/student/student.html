@@ -1,10 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% include 'drawing/drawing-base.html' with problem=problem %}
 
-</body>
-</html>
+
+<script> //problem object
+
+window.problem = {};
+window.problem.name = '{{ problem.name }}';
+window.problem.goals = JSON.parse('{{ problem.goals_elements | escapejs }}');
+window.problem.costs = JSON.parse('{{ problem.costs | escapejs}}');
+window.problem.base64 = '{{ problem.base64 }}';
+window.problem.description = '{{ problem.description | escapejs}}';
+
+</script>
+
+
+<script> // navbar
+$('#top-navbar-left').append('<i class="question big icon"></i>',
+    '<h3 id="name">{{ problem.name }}</h3>');
+
+$('#top-navbar-right').append(
+    '<i title="Save" class="save outline big icon" id="accept"></i>');
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        function show_question() {
+            let card = $("#question-card");
+            card.show();
+            card.animate({left: "5px", top: "5px"});
+        }
+
+
+        //green
+        let green_item = $(".green-mini-menu");
+        icon = $('<i class="window maximize outline large icon"></i>');
+        green_item.append(icon);
+        green_item.prop("title", "Problem window");
+        green_item.click(show_question);
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+
+        //lightblue
+        let lightblue_item = $(".lightblue-mini-menu");
+        icon = $('<i class="dollar sign large icon"></i>');
+        lightblue_item.append(icon);
+        lightblue_item.prop("title", "Pricing");
+
+        let form_html = "<br>";
+
+        let options = window.problem.costs;
+
+        options.forEach(function (option, index) {
+            let item = '<img class="cost-image" src="' + option.image_url + '">';
+            palceholder = option.name === 'reward' ? 'reward of reaching goals' : 'cost of each ' + option.name;
+            item +=
+                '<input placeholder="' + palceholder +
+                '" id="swal-' +
+                option.name +
+                '-input" value="' +
+                option.value +
+                '" class="swal2-input" type="number" style="max-width: 100%">';
+            form_html += item;
+        });
+        lightblue_item.click(async function () {
+            const {value: formValues} = await Swal.fire({
+                title: "Specify the cost of each element",
+                html: form_html,
+                focusConfirm: false,
+                preConfirm: () => {
+                    options.forEach(function (option, index) {
+                        let id = "swal-" + option.name + "-input";
+                        let value = document.getElementById(id).value;
+                        option.value = value;
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+<script> // geogebra_api functions and init
+
+function init_geogebra() {
+    let top_navbar_height = $("#top-navbar").height();
+    $("#ggb-container").css("padding-top", top_navbar_height);
+
+
+    var parameters = {
+        id: "app1",
+        prerelease: false,
+        showToolBar: true,
+        borderColor: "blue",
+        showMenuBar: false,
+        showAlgebraInput: false,
+        showResetIcon: true,
+        enableLabelDrags: false,
+        enableShiftDragZoom: true,
+        enableRightClick: true,
+        capturingThreshold: null,
+        showToolBarHelp: false,
+        useBrowserForJS: false,
+        showLogging: true,
+        enableCAS: false,
+        errorDialogsActive: false,
+        // customToolBar: '1|2',
+        ggbBase64: window.problem.base64
+    };
+
+    parameters.appletOnLoad = function (api) {
+        api.setGridVisible(false);
+        api.setAxesVisible(false, false);
+        window.geogebra_api = api;
+        teacher_features(api);
+    };
+
+    window.ggbApp = new GGBApplet(parameters);
+    ggbApp.inject("ggb-container");
+}
+
+function create_new_geogebra() {
+    if (document.readyState === "complete") {
+        init_geogebra();
+    } else {
+        window.addEventListener("load", function () {
+            init_geogebra();
+        });
+    }
+}
+
+// $(window).on("resize", function() {
+//   $("#ggb-element").remove();
+//   create_new_geogebra();
+// });
+
+create_new_geogebra();
+
+
+function teacher_features(api) {
+
+    api.normalColor = function () {
+        let names = api.getAllObjectNames();
+        names.forEach(function (name, index) {
+            api.setColor(name, 52, 100, 251);
+        });
+    };
+    api.normalColor();
+
+    api.setGoalObjects = function (goals) {
+        window.problem.goals = goals;
+        api.normalColor();
+        goals.forEach(function (name, index) {
+            api.setColor(name, 255, 0, 10);
+            api.setVisible(name, true);
+        });
+    };
+
+    api.setGoalObjects(window.problem.goals);
+
+    api.registerAddListener(calculate_cost);
+    api.registerRemoveListener(calculate_cost);
+}
+</script>
+
+<script>
+    Array.from(window.problem.goals).forEach(function (item, index) {
+        window.geogebra_api.renameObject(item, 'goal-' + item);
+        window.geogebra_api.setVisible(item, false);
+    })
+</script>
+
+
+<script>
+
+    function check_goals_reaching() {
+        window.geogebra_api.normalColor();
+        Array.from(window.problem.goals).forEach(function (goalName, index) {
+            goal_name = 'goal-' + goalName;
+            flag = false;
+            Array.from(window.geogebra_api.getAllObjectNames()).forEach(function (objName) {
+                if (window.geogebra_api.getXcoord(objName) === window.geogebra_api.getXcoord(goal_name) &&
+                    window.geogebra_api.getYcoord(objName) === window.geogebra_api.getYcoord(goal_name) &&
+                    window.geogebra_api.getZcoord(objName) === window.geogebra_api.getZcoord(goal_name)) {
+
+                }
+            })
+        })
+    }
+
+
+    function calculate_cost() {
+
+    }
+</script>

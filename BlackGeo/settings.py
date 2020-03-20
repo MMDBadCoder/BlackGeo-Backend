@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'accounting',
     'homeService',
     'drawingProblems',
+    'problemManager',
+    'setManager',
 ]
 
 MIDDLEWARE = [

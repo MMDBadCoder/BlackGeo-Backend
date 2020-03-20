@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'home/home-base.html' %}
 
-</body>
-</html>
+{% block home-head %}
+    <title>{{ set.title }}</title>
+{% endblock %}
+
+{% block home-body %}
+
+    <div style="z-index: 10">
+        <br>
+        <br>
+        <br>
+        <a target="_blank" href="{% url 'drawingProblems:new-problem' set.id %}"><i class="plus massive green icon"></i></a>
+        <table class="ui five column table">
+            <tbody>
+            {% for problem in set.problems.all %}
+                <tr>
+                    <td>{{ 'name: ' }}{{ problem.name }}</td>
+                    <td><a target="_blank" href="{% url 'drawingProblems:page-as-teacher' problem.id %}"><i class="eye big white icon"></i></a></td>
+                    <td><a href="{% url 'drawingProblems:delete' problem.id %}"><i class="cancel big white icon"></i></a></td>
+                    <td>Male</td>
+                    <td>None</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+
+{% endblock %}
