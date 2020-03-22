@@ -1,0 +1,317 @@
+<script>
+
+    class SolutionManager {
+        constructor(api, problem, solution = undefined) {
+            this.problem = problem;
+            this.geogebra_api = api;
+
+            if (solution === undefined) {
+                this.first_fixedGoalByName = {};
+                this.first_commandCodeByName = {};
+            } else {
+                this.first_commandCodeByName = solution.commandCodeByName;
+                this.first_fixedGoalByName = solution.fixedGoalByName;
+            }
+
+            this.optionByCode = {};
+            this.score = 0;
+            this.commandCodeByName = {};
+            Array.from(this.problem.costs).forEach(function (option, index) {
+                if (option.name === 'reward') {
+                    this.reward_option = option;
+                    return;
+                }
+                this.optionByCode[option.code] = option;
+            }.bind(this));
+
+            this.reset();
+        }
+
+        all_goals_reached = function () {
+            return this.problem.goals.length === Object.keys(this.fixedGoalByName).length;
+        }.bind(this);
+
+        addObject = function (objName, code) {
+            let type = this.geogebra_api.getObjectType(objName);
+
+            Array.from(this.problem.goals).forEach(function (goal) {
+
+                let goalName = window.studentManager.goalPreFixWord + goal;
+
+                if (type === this.geogebra_api.getObjectType(goalName)) {
+                    let eval_command = 'AreEqual(' + goalName + ', ' + objName + ')';
+                    this.geogebra_api.evalCommand(eval_command);
+                    let booleanObjectName = this.geogebra_api.evalCommandGetLabels(eval_command);
+                    let value = this.geogebra_api.getValue(booleanObjectName);
+                    if (value === 1) {
+                        this.geogebra_api.setColor(objName, 0, 255, 0);
+                        this.fixedGoalByName[objName] = goalName;
+                        if (this.all_goals_reached()) {
+                            this.score += parseInt(this.reward_option.value);
+                        }
+                    }
+                    this.geogebra_api.deleteObject(booleanObjectName);
+                }
+            }.bind(this));
+
+
+            this.commandCodeByName[objName] = code;
+            this.score -= parseInt(this.optionByCode[code].value);
+            this.update_score_tab();
+        }.bind(this);
+
+        removeListener = function (objName) {
+            let goal = this.fixedGoalByName[objName];
+            if (goal !== undefined) {
+                if (this.all_goals_reached()) {
+                    this.score -= parseInt(this.reward_option.value);
+                }
+                delete this.fixedGoalByName[objName];
+            }
+
+            let code = this.commandCodeByName[objName];
+            if (code !== undefined) {
+                this.score += parseInt(this.optionByCode[code].value);
+                delete this.commandCodeByName[objName];
+            }
+
+            this.update_score_tab();
+        }.bind(this);
+
+        reset = function () {
+            this.fixedGoalByName = JSON.parse(JSON.stringify(this.first_fixedGoalByName));
+            this.commandCodeByName = JSON.parse(JSON.stringify(this.first_commandCodeByName));
+            this.calculate_score();
+            this.update_score_tab();
+        }.bind(this);
+        calculate_score = function () {
+            this.score = 0;
+            for (let [key, value] of Object.entries(this.commandCodeByName)) {
+                this.score -= parseInt(this.optionByCode[key].value);
+            }
+            if (this.all_goals_reached()) {
+                this.score += parseInt(this.reward_option.value);
+            }
+        }.bind(this);
+
+        update_score_tab = function () {
+            setTimeout(function () {
+                let score_element = $('#score');
+
+                if (this.score === 0) {
+                    score_element.css('color', 'yellow');
+                } else if (this.score > 0) {
+                    score_element.css('color', 'lightgreen');
+                } else {
+                    score_element.css('color', 'red');
+                }
+                score_element.text(this.score);
+            }.bind(this), 200);
+        }.bind(this);
+    }
+
+
+</script> {# solution manager #}
+
+
+<script>
+    class StudentManager {
+        constructor(containerId, problem, solution = undefined) { //ggb-container
+            this.goalPreFixWord = 'goalgoal';
+            this.problem = problem;
+            this.solotion = solution;
+
+            let top_navbar_height = $("#top-navbar").height();
+            $("#" + containerId).css("padding-top", top_navbar_height);
+
+            let available_code_list = [];
+
+            Array.from(window.problem.costs).forEach(function (option, index) {
+                if (option.value !== '' && option.name !== 'reward') {
+                    available_code_list.push(option.code);
+                }
+            });
+
+            var parameters = {
+                id: "app1",
+                prerelease: false,
+                showToolBar: true,
+                borderColor: "blue",
+                showMenuBar: false,
+                showAlgebraInput: true,
+                showResetIcon: false,
+                enableLabelDrags: false,
+                enableShiftDragZoom: true,
+                enableRightClick: true,
+                capturingThreshold: null,
+                showToolBarHelp: false,
+                useBrowserForJS: false,
+                showLogging: true,
+                enableCAS: false,
+                enableUndoRedo: false,
+                errorDialogsActive: false,
+                customToolBar: '0,6,40,41,42|' + available_code_list.join(','),
+                ggbBase64: window.problem.base64
+            };
+
+            parameters.appletOnLoad = async function (api) {
+                this.geogebra_api = api;
+                window.geogebra_api = api;
+
+                this.rename_and_visible_goals(api);
+
+                api.setGridVisible(false);
+                api.setAxesVisible(false, false);
+
+                this.solutionManager = new SolutionManager(api, window.problem);
+                this.add_eventListeners();
+
+            }.bind(this);
+
+            window.ggbApp = new GGBApplet(parameters);
+            ggbApp.inject(containerId);
+        }
+
+
+        rename_and_visible_goals = function () {
+            for (let i = 0; i < this.problem.goals.length; i++) {
+                let goal = window.problem.goals[i];
+                let new_name = this.goalPreFixWord + goal;
+                this.geogebra_api.setVisible(goal, false);
+                this.geogebra_api.renameObject(goal, new_name);
+            }
+        }.bind(this);
+
+        add_eventListeners = function () {
+            let addListener = function (objName) {
+                let code = this.geogebra_api.getMode();
+                let type = this.geogebra_api.getObjectType(objName);
+                if (type === 'boolean') {
+                    return;
+                }
+                if (type === 'point' && code !== 19) {
+                    code = 1;
+                }
+                this.solutionManager.addObject(objName, code);
+            }.bind(this);
+
+            this.geogebra_api.registerAddListener(addListener);
+            this.geogebra_api.registerRemoveListener(this.solutionManager.removeListener);
+
+        }.bind(this);
+
+        show_score_swal = function () {
+            if (Object.keys(this.solutionManager.commandCodeByName).length === 0) {
+                Swal.fire(
+                    "Your Score : 0",
+                    'Nothing has been drawn yet',
+                    'info'
+                );
+                return;
+            }
+
+            let html_table = "<table class=\"ui very basic collapsing celled table\">\n";
+            let tabel_head = "<thead><tr><th>Element</th><th>Cost</th></tr></thead>";
+            let table_body = '<tbody>';
+
+            if (this.solutionManager.all_goals_reached()) {
+                table_body += '<tr><td><h4 class="ui image header">\n' +
+                    '<img class= "cost-image" src="' + this.solutionManager.reward_option.image_url + '" class="ui mini rounded image">\n' +
+                    '<div class="content">' + name +
+                    '<div class="sub header">' + this.geogebra_api.getCommandString(name) +
+                    '</div></div></h4></td><td>' +
+                    '<strong style="color: green">+' + this.solutionManager.reward_option.value + '</strong>' +
+                    '</td></tr>';
+            }
+
+            for (let [key, value] of Object.entries(this.solutionManager.commandCodeByName)) {
+                let name = key;
+                let option = this.solutionManager.optionByCode[value];
+                let cost = option.value;
+                let item_html = '<tr><td><h4 class="ui image header">' +
+                    '<img src="' + option.image_url + '" class="ui mini rounded image">' +
+                    '<div class="content">' + name +
+                    '<div class="sub header">' + this.geogebra_api.getCommandString(name) +
+                    '</div></div></h4></td><td><strong style="color: red">-' + cost + '</strong></td></tr>';
+                table_body += item_html;
+            }
+
+            table_body += '</tbody>';
+            html_table += html_table += tabel_head;
+            html_table += table_body;
+            html_table += '</tabel>';
+
+            let color = 'red';
+
+            let score = this.solutionManager.score;
+            if (score === 0) {
+                color = 'yellow';
+            } else if (score > 0) {
+                color = 'lightgreen';
+            }
+
+            let tabel_foot = '<tfoot class="full-width"><tr></tr><tr style="background-color: ' + color + '; text-align: center;"><th>total</th><th>' + this.solutionManager.score + '</th></tr></tfoot>';
+            html_table += tabel_foot;
+
+            Swal.fire({
+                title: "Your Score",
+                html: html_table,
+                focusConfirm: false,
+                preConfirm: () => {
+                }
+            });
+        }.bind(this);
+
+        show_pricing_swal = function () {
+
+            let html_table = "<table class=\"ui very basic collapsing celled table\">\n";
+            let tabel_head = "<thead><tr><th>Element</th><th>Cost</th></tr></thead>";
+            let table_body = '<tbody>';
+
+
+            Array.from(this.problem.costs).forEach(function (option) {
+                if (option.value === '') {
+                    return;
+                }
+
+                let cost = option.value;
+                let color = 'green';
+                if (option.name === 'reward') {
+                    cost = '+' + cost;
+                } else if (option.value !== '0') {
+                    color = 'red';
+                    cost = '-' + cost;
+                }
+
+                let item_html = '<tr><td><h4 class="ui image header">' +
+                    '<img src="' + option.image_url + '" class="ui mini rounded image">' +
+                    '<div class="content">' + option.name +
+                    '<div class="sub header">' +
+                    '</div></div></h4></td><td><strong style="color: ' + color + '">' + cost + '</strong></td></tr>';
+                table_body += item_html;
+            }.bind(this));
+
+
+            table_body += '</tbody>';
+            html_table += html_table += tabel_head;
+            html_table += table_body;
+            html_table += '</tabel>';
+
+            Swal.fire({
+                title: "Cost of each element",
+                html: html_table,
+                focusConfirm: false,
+                preConfirm: () => {
+                }
+            });
+        }.bind(this);
+
+
+        reset = function () {
+            this.geogebra_api.setBase64(window.problem.base64);
+            this.rename_and_visible_goals(window.geogebra_api);
+            this.solutionManager.reset();
+        }.bind(this);
+    }
+</script> {# student manager #}
+

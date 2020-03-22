@@ -76,16 +76,16 @@ $('#accept').click(function () {
 </script>
 <script> //blue
 
-    $(document).ready(function () {
-        let blue_item = $(".blue-mini-menu");
-        address = location.origin + '{% url 'drawing:page-as-student' problem.id %}';
-        blue_item.click(function () {
-            window.open(address, '_blank');
-        });
-        icon = $('<i class="eye large icon"></i>');
-        blue_item.append(icon);
-        blue_item.prop("title", "Problem Page as student");
+$(document).ready(function () {
+    let blue_item = $(".blue-mini-menu");
+    address = location.origin + '{% url 'drawing:page-as-student' problem.id %}';
+    blue_item.click(function () {
+        window.open(address, '_blank');
     });
+    icon = $('<i class="eye large icon"></i>');
+    blue_item.append(icon);
+    blue_item.prop("title", "Problem Page as student");
+});
 
 </script>
 <script>
@@ -228,23 +228,27 @@ $('#accept').click(function () {
         lightblue_item.append(icon);
         lightblue_item.prop("title", "Pricing");
 
-        let form_html = "<br>";
 
-        let options = window.problem.costs;
-
-        options.forEach(function (option, index) {
-            let item = '<img class="cost-image" src="' + option.image_url + '">';
-            palceholder = option.name === 'reward' ? 'reward of reaching goals' : 'cost of each ' + option.name;
-            item +=
-                '<input placeholder="' + palceholder +
-                '" id="swal-' +
-                option.name +
-                '-input" value="' +
-                option.value +
-                '" class="swal2-input" type="number" style="max-width: 100%">';
-            form_html += item;
-        });
         lightblue_item.click(async function () {
+
+            let form_html = "<br>";
+
+            let options = window.problem.costs;
+
+            options.forEach(function (option, index) {
+                let item = '<img class="cost-image" src="' + option.image_url + '">';
+                palceholder = option.name === 'reward' ? 'reward of reaching goals' : 'cost of each ' + option.name;
+                item +=
+                    '<input placeholder="' + palceholder +
+                    '" id="swal-' +
+                    option.name +
+                    '-input" value="' +
+                    option.value +
+                    '" class="swal2-input" type="number" style="max-width: 100%">';
+                form_html += item;
+            });
+
+
             const {value: formValues} = await Swal.fire({
                 title: "Specify the cost of each element",
                 html: form_html,
