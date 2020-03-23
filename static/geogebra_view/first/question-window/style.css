@@ -1,10 +1,23 @@
 body {
-  height: 100vh;
-  margin: 0;
+    height: 100vh;
+    margin: 0;
 }
 
 #question_box {
-  width: fit-content;
-  height: fit-content;
-  position: absolute;
+    width: fit-content;
+    height: fit-content;
+    position: absolute;
+}
+
+#question-card {
+    background-color: #73c5ff1c;
+    color: #154082;
+    padding: 10px;
+    border: solid 1px #3f3ffd;
+}
+
+#question-card > p {
+    margin: 10px;
+    font-size: 20px;
+  font-family: sans-serif;
 }

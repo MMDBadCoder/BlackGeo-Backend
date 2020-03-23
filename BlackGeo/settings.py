@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'drawingProblems',
     'problemManager',
     'setManager',
+    'solutionManager',
+    'drawingSolutions',
 ]
 
 MIDDLEWARE = [

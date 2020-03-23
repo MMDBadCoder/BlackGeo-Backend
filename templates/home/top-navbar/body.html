@@ -1,19 +1,13 @@
 <nav id="top-navbar">
     <div class="left-part-top-navbar top-navbar-part">
         <a><i class="question big icon"></i></a>
-        {#        &nbsp;#}
-        {#        &nbsp;#}
-        {#        &nbsp;#}
-        {#        <div class="top-navbar-icon">#}
-        {#            <h4>No named yet</h4>#}
-        {#        </div>#}
     </div>
     <div class="right-part-top-navbar top-navbar-part">
         <a href="{% url 'home' %}" title="Home"><i class="icon home big"></i></a>
         {% if request.user.is_authenticated %}
-            <a href="{% url 'logout' %}" title="Logout"><i class="icon user big"></i></a>
+            <a href="{% url 'logout' %}" title="Logout"><i class="icon sign-out alternate big"></i></a>
         {% else %}
-            <a href="{% url 'login' %}" title="Login"><i class="icon user big"></i></a>
+            <a href="{% url 'login' %}" title="Login"><i class="icon sign-in alternate big"></i></a>
         {% endif %}
     </div>
 </nav>

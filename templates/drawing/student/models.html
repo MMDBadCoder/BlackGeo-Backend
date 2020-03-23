@@ -87,7 +87,7 @@
         calculate_score = function () {
             this.score = 0;
             for (let [key, value] of Object.entries(this.commandCodeByName)) {
-                this.score -= parseInt(this.optionByCode[key].value);
+                this.score -= parseInt(this.optionByCode[value].value);
             }
             if (this.all_goals_reached()) {
                 this.score += parseInt(this.reward_option.value);
@@ -108,6 +108,7 @@
                 score_element.text(this.score);
             }.bind(this), 200);
         }.bind(this);
+
     }
 
 
@@ -142,7 +143,7 @@
                 showResetIcon: false,
                 enableLabelDrags: false,
                 enableShiftDragZoom: true,
-                enableRightClick: true,
+                enableRightClick: false,
                 capturingThreshold: null,
                 showToolBarHelp: false,
                 useBrowserForJS: false,
@@ -158,12 +159,14 @@
                 this.geogebra_api = api;
                 window.geogebra_api = api;
 
-                this.rename_and_visible_goals(api);
+                if (solution === undefined) {
+                    this.rename_and_visible_goals(api);
+                }
 
                 api.setGridVisible(false);
                 api.setAxesVisible(false, false);
 
-                this.solutionManager = new SolutionManager(api, window.problem);
+                this.solutionManager = new SolutionManager(api, this.problem, this.solotion);
                 this.add_eventListeners();
 
             }.bind(this);
@@ -227,12 +230,17 @@
             for (let [key, value] of Object.entries(this.solutionManager.commandCodeByName)) {
                 let name = key;
                 let option = this.solutionManager.optionByCode[value];
+                let color = 'yellow';
                 let cost = option.value;
+                if (cost > 0) {
+                    cost = '-' + cost;
+                    color = 'red';
+                }
                 let item_html = '<tr><td><h4 class="ui image header">' +
                     '<img src="' + option.image_url + '" class="ui mini rounded image">' +
                     '<div class="content">' + name +
                     '<div class="sub header">' + this.geogebra_api.getCommandString(name) +
-                    '</div></div></h4></td><td><strong style="color: red">-' + cost + '</strong></td></tr>';
+                    '</div></div></h4></td><td><strong style="color: ' + color + '">' + cost + '</strong></td></tr>';
                 table_body += item_html;
             }
 
@@ -308,10 +316,50 @@
 
 
         reset = function () {
+            this.geogebra_api.reset();
             this.geogebra_api.setBase64(window.problem.base64);
             this.rename_and_visible_goals(window.geogebra_api);
             this.solutionManager.reset();
         }.bind(this);
+
+
+        record_solution = function () {
+
+            let data = {
+                jsonObject: JSON.stringify({
+                    fixedGoalByName: this.solutionManager.fixedGoalByName,
+                    commandCodeByName: this.solutionManager.commandCodeByName,
+                }),
+                score: this.solutionManager.score,
+                base64: this.geogebra_api.getBase64(),
+                public: 'True',
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'drawingSolutions:record-solution' problem.id %}',
+                data: data,
+                success: function (json) {
+                    Swal.fire(
+                        'Success!',
+                        'Your solution has been registered.',
+                        'success'
+                    );
+                },
+                error: function (xhr, errmsg, err) {
+                    console.log(xhr);
+                    console.log(errmsg);
+                    console.log(err);
+                    Swal.fire(
+                        'Error!',
+                        'Your solution cannot be registered.',
+                        'error'
+                    );
+                }
+            });
+        }.bind(this);
+
     }
 </script> {# student manager #}
 

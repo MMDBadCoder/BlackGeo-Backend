@@ -1,3 +1,8 @@
 from django.contrib import admin
+from drawingSolutions.models import DrawingSolution
 
-# Register your models here.
+
+@admin.register(DrawingSolution)
+class DrawingSolutionAdmin(admin.ModelAdmin):
+    pass
+

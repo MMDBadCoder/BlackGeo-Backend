@@ -1,5 +1,5 @@
 {% include 'drawing/drawing-base.html' with problem=problem %}
-{% include 'drawing/student/models.html' %}
+{% include 'drawing/student/models.html' with problem=problem %}
 
 <script> //problem object
 
@@ -9,7 +9,10 @@ window.problem.goals = JSON.parse('{{ problem.goals_elements | escapejs }}');
 window.problem.costs = JSON.parse('{{ problem.costs | escapejs}}');
 window.problem.base64 = '{{ problem.base64 }}';
 window.problem.description = '{{ problem.description | escapejs}}';
-
+{% if solution %}
+    window.problem.base64 = '{{ solution.base64 }}';
+    window.solution = JSON.parse('{{ solution.jsonObject | escapejs}}');
+{% endif %}
 
 </script>
 
@@ -17,7 +20,7 @@ window.problem.description = '{{ problem.description | escapejs}}';
 <script> // init
 
 $(document).ready(function () {
-    window.studentManager = new StudentManager('ggb-container', window.problem);
+    window.studentManager = new StudentManager('ggb-container', window.problem, window.solution);
 });
 
 </script>
@@ -67,6 +70,20 @@ $(document).ready(function () {
 });
 </script> {# blue #}
 
+
+<script> //orange
+$(document).ready(function () {
+    let orange_item = $(".orange-mini-menu");
+    icon = $('<i class="file alternate large icon"></i>');
+    orange_item.append(icon);
+    orange_item.prop("title", "Your Solution");
+    address = location.origin + '{% url 'drawingSolutions:solution-page' problem.id request.user.username %}';
+    orange_item.click(function () {
+        window.open(address, '_blank');
+    });
+});
+</script> {# orange #}
+
 <script> // navbar
 
 $(document).ready(function () {
@@ -78,7 +95,12 @@ $(document).ready(function () {
         '<i title="Reset" class="sync big icon" id="reset"></i>',
         '<i title="Submit" class="check big icon" id="submit"></i>');
 
+    $('#submit').click(window.studentManager.record_solution);
+    $('#reset').click(window.studentManager.reset);
+
     $('#score').click(window.studentManager.show_score_swal);
+
 });
 
 </script> {# navbar #}
+

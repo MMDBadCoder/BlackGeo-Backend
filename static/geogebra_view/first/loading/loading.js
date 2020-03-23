@@ -14,7 +14,7 @@ $(document).ready(function () {
             new_width = $('#body').width();
             new_height = $('#body').height();
             diff = Math.abs(new_width - last_width) + Math.abs(new_height - last_heigth);
-            if (diff > 200) {
+            if (diff > 500) {
                 location.reload();
             }
         }, 0);

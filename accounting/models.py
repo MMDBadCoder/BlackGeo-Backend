@@ -8,4 +8,4 @@ class Account(models.Model):
     activation_code = models.CharField(max_length=10, default='', blank=True)
 
     def __str__(self):
-        return self.user.first_name + ' ' + self.user.last_name
+        return self.user.username
