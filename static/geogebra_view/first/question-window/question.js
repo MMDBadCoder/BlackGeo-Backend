@@ -17,8 +17,8 @@ $('#question-size-minus').click(function (){
   if(card.width() <= 170){
     return
   }
-  card.width('-=10px');
-  card.height('-=10px');
+  card.width(card.width() -10);
+  card.height(card.height() -10);
   card.height('fit-content');
 });
 

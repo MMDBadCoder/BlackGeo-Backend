@@ -1,31 +1,325 @@
+
+
 {% extends 'home/home-base.html' %}
 
 {% block home-head %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ set.title }}</title>
+    <style>
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            margin-right: auto;
+            margin-left: auto;
+            box-sizing: border-box;
+            z-index: 1;
+            padding: 30px;
+        }
+
+        .container * {
+            box-sizing: border-box;
+        }
+
+        .bg-white {
+            background-color: #ffffffbf;
+            border-radius: 3px;
+            border: solid 2px #14149a;
+        }
+
+        .h-100 {
+            height: 100% !important;
+        }
+
+        .tm-mt-small > .col-12 > p {
+            background-color: #0000007a;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+        }
+
+
+        .tm-bg-black {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .tm-mt-big {
+            margin-top: 70px;
+        }
+
+        .tm-mt-small {
+            margin-top: 20px;
+        }
+
+        .tm-block {
+            padding: 50px 45px;
+        }
+
+        .navbar-light .navbar-nav a:hover {
+            background-color: #e6e6e6;
+        }
+
+        .tm-content-row {
+            justify-content: space-between;
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+
+        .tm-col {
+            padding-left: 20px;
+            padding-right: 20px;
+            margin-bottom: 50px;
+        }
+
+        .tm-col-big {
+            width: 39%;
+        }
+
+        .tm-col-small {
+            width: 21.95%;
+        }
+
+
+        .tm-list-group > li {
+            list-style-type: none;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+        }
+
+        .tm-list-group-pad-big > li {
+            padding: 20px;
+        }
+
+        .tm-list-group > li:hover {
+            color: #0266c4;
+        }
+
+        .tm-list-group-alternate-color > li:nth-child(odd) {
+            background-color: #e6e6e6;
+        }
+
+        .tm-list-group > li:before {
+            counter-increment: myOrderedListItemsCounter;
+            content: counter(myOrderedListItemsCounter) ".";
+            margin-right: 0.5em;
+        }
+
+        .tm-list > li {
+            margin-bottom: 20px;
+        }
+
+        .table td,
+        .table th {
+            padding: 20px 24px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: white;
+            color: #3aabd0;
+        }
+
+
+        .tm-table-striped-even.table-striped tbody tr:nth-of-type(even) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .tm-table-striped-even.table-striped tbody tr:nth-of-type(odd) {
+            background-color: white;
+        }
+
+
+        footer {
+            margin-bottom: 35px;
+        }
+
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1630px;
+            }
+        }
+
+
+        @media (max-width: 1199px) {
+            .tm-col-big,
+            .tm-col-small {
+                width: 49.65%;
+            }
+
+        }
+
+        @media (max-width: 991px) {
+            .tm-col-big,
+            .tm-col-small {
+                width: 100%;
+                min-height: 383px;
+                height: auto;
+            }
+
+            .tm-block {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tm-mt-big {
+                margin-top: 45px;
+            }
+        }
+
+    </style>
+
 {% endblock %}
 
 {% block home-body %}
+    <div class="container">
+        <div class="row tm-content-row tm-mt-big">
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    <table class="ui very basic collapsing celled table">
+                        <thead>
+                        <tr>
+                            <th style=" color: darkblue; font-size: 25px;">Problem</th>
+                            <th style=" color: darkgreen; font-size: 20px;">Your Score</th>
+                            {% if request.user.is_authenticated and set.author == request.user.account %}
+                                <th style=" color: darkgreen; font-size: 20px;">Edit</th>
+                            {% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for problem_and_solution in problem_and_solutions %}
+                            <tr>
+                                <td>
+                                    <h4 class="ui image header">
+                                        <img src="/images/avatar2/small/lena.png" class="ui mini rounded image">
+                                        <div class="content">
+                                            <div class="sub header">
+                                                <a href="{% url 'drawingProblems:page-as-student' problem_and_solution.problem.id %}"
+                                                   target="_blank">
+                                                    <h3>{{ problem_and_solution.problem.name }}</h3>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </h4>
+                                </td>
+                                <td style="font-size: 20px">
+                                    {% if problem_and_solution.solution %}
+                                        <a href="{% url 'drawingSolutions:solution-page' problem_and_solution.problem.id request.user.username %}"
+                                           target="_blank">
+                                            <strong style="color: green">{{ problem_and_solution.solution.score }}</strong>
+                                        </a>
+                                    {% else %}
+                                        <strong style="color: red">No solved yet</strong>
+                                    {% endif %}
+                                </td>
+                                {% if request.user.is_authenticated and set.author == request.user.account %}
+                                    <td>
+                                        <a href="{% url 'drawingProblems:page-as-teacher' problem_and_solution.problem.id %}"
+                                           target="_blank">
+                                            <i class="pencil blue lareg icon"></i>
+                                        </a>
+                                        <a href="{% url 'drawingProblems:delete' problem_and_solution.problem.id %}">
+                                            <i class="trash alternate large red icon"></i>
+                                        </a>
+                                    </td>
+                                {% endif %}
+                            </tr>
 
-    <div style="z-index: 10">
-        <br>
-        <br>
-        <br>
-        <a target="_blank" href="{% url 'drawingProblems:new-problem' set.id %}"><i class="plus massive green icon"></i></a>
-        <table class="ui five column table">
-            <tbody>
-            {% for problem in set.problems.all %}
-                <tr>
-                    <td>{{ 'name: ' }}{{ problem.name }}</td>
-                    <td><a target="_blank" href="{% url 'drawingProblems:page-as-teacher' problem.id %}"><i class="eye big white icon"></i></a></td>
-                    <td><a href="{% url 'drawingProblems:delete' problem.id %}"><i class="cancel big white icon"></i></a></td>
-                    <td>Male</td>
-                    <td>None</td>
-                </tr>
-            {% endfor %}
-            </tbody>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot class="full-width">
+                        <tr></tr>
+                        <tr style="background-color: #001da926; text-align: center;">
+                            <th style="font-weight: bold">Total Score</th>
+                            <th style="font-weight: bold">{{ total_score }}</th>
+                        </tr>
+                        </tfoot>
+                    </table>
 
-        </table>
+                    {% if request.user.is_authenticated and set.author == request.user.account %}
+                        <button class="ui primary button">
+                            <a href="{% url 'drawing:new-problem' set.id %}" target="_blank" style="color: white">
+                                Add new problem &nbsp;<i class="plus large icon"></i>
+                            </a>
+                        </button>
+
+                    {% endif %}
+
+                </div>
+            </div>
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    <table class="ui very basic collapsing celled table">
+                        <thead>
+                        <tr>
+                            <th style=" color: darkblue; font-size: 25px;">Account</th>
+                            <th style=" color: darkgreen; font-size: 20px;">Total score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for top_account in top_accounts %}
+                            <tr>
+                                <td>
+                                    <h4 class="ui image header">
+                                        <img src="/images/avatar2/small/lena.png" class="ui mini rounded image">
+                                        <div class="content">
+                                            <div class="sub header">
+                                                <a href="#">
+                                                    <h3>{{ top_account.account }}</h3>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </h4>
+                                </td>
+                                <td style="font-size: 20px">
+                                    <strong style="color: green">{{ top_account.score }}</strong>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div class="tm-col tm-col-small">
+                <div class="bg-white tm-block h-100">
+                    3
+                </div>
+            </div>
+
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    4
+                </div>
+            </div>
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    5
+                </div>
+            </div>
+            <div class="tm-col tm-col-small">
+                <div class="bg-white tm-block h-100">
+                    6
+                </div>
+            </div>
+
+        </div>
+        <footer class="row tm-mt-small">
+            <div class="col-12">
+                <p class="d-inline-block tm-bg-black text-white py-2 px-4">
+                    BlackGeo
+                </p>
+            </div>
+        </footer>
     </div>
-
-
 {% endblock %}

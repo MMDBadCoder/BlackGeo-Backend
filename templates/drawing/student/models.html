@@ -323,41 +323,70 @@
         }.bind(this);
 
 
-        record_solution = function () {
+        record_solution = async function () {
 
-            let data = {
-                jsonObject: JSON.stringify({
-                    fixedGoalByName: this.solutionManager.fixedGoalByName,
-                    commandCodeByName: this.solutionManager.commandCodeByName,
-                }),
-                score: this.solutionManager.score,
-                base64: this.geogebra_api.getBase64(),
-                public: 'True',
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            };
+            let send = function (is_public) {
+                let data = {
+                    jsonObject: JSON.stringify({
+                        fixedGoalByName: this.solutionManager.fixedGoalByName,
+                        commandCodeByName: this.solutionManager.commandCodeByName,
+                    }),
+                    score: this.solutionManager.score,
+                    base64: this.geogebra_api.getBase64(),
+                    public: is_public,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                };
 
-            $.ajax({
-                type: 'POST',
-                url: '{% url 'drawingSolutions:record-solution' problem.id %}',
-                data: data,
-                success: function (json) {
-                    Swal.fire(
-                        'Success!',
-                        'Your solution has been registered.',
-                        'success'
-                    );
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'drawingSolutions:record-solution' problem.id %}',
+                    data: data,
+                    success: function (json) {
+                        Swal.fire(
+                            'Success!',
+                            'Your solution has been registered.',
+                            'success'
+                        );
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log(xhr);
+                        console.log(errmsg);
+                        console.log(err);
+                        Swal.fire(
+                            'Error!',
+                            'Your solution cannot be registered.',
+                            'error'
+                        );
+                    }
+                });
+            }.bind(this);
+
+
+            const {value: security} = await Swal.fire({
+                title: 'Select field validation',
+                input: 'select',
+                inputOptions: {
+                    True: 'public',
+                    False: 'private',
                 },
-                error: function (xhr, errmsg, err) {
-                    console.log(xhr);
-                    console.log(errmsg);
-                    console.log(err);
-                    Swal.fire(
-                        'Error!',
-                        'Your solution cannot be registered.',
-                        'error'
-                    );
+                inputPlaceholder: 'Select a security type',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    return new Promise((resolve) => {
+                        if (value !== '') {
+                            resolve()
+                        } else {
+                            resolve('Public or Private?')
+                        }
+                    })
                 }
             });
+
+            if (security) {
+                send(security);
+            }
+
+
         }.bind(this);
 
     }

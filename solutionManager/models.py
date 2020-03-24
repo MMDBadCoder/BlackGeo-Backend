@@ -8,3 +8,4 @@ from problemManager.models import Problem
 class Solution(models.Model):
     problem = models.ForeignKey(Problem, null=True, default=None, on_delete=models.CASCADE)
     account = models.ForeignKey(Account, null=True, default=None, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)

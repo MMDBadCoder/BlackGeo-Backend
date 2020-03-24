@@ -1,6 +1,11 @@
+import json
+
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.shortcuts import render
 from django.http import Http404, HttpResponseBadRequest, HttpResponse
+from django.urls import reverse
+
 from drawingProblems.models import DrawingProblem
 from drawingSolutions.models import DrawingSolution
 
@@ -34,4 +39,21 @@ def solution_page(request, problem_id, username):
     solution = DrawingSolution.get_solution(problem_id, username)
     if not solution:
         raise Http404
+    if (not solution.public) and (solution.account != request.user.account):
+        return HttpResponseBadRequest()
     return render(request, 'drawing/student/student.html', {'problem': problem, 'solution': solution})
+
+
+def get_solutions(request, problem_id):
+    solutions = DrawingSolution.objects.filter(problem__id=problem_id).order_by('-score')
+    result = []
+    for solution in solutions[0:10]:
+        solution_address = reverse('drawingSolutions:solution-page',
+                          kwargs={'problem_id': problem_id, 'username': solution.account.user.username})
+        result.append({
+            'score': solution.score,
+            'public': solution.public,
+            'name': str(solution.account.user),
+            'href': solution_address
+        })
+    return HttpResponse(json.dumps(result), status=200)

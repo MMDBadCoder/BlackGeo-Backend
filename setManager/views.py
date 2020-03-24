@@ -1,12 +1,34 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse
+
+from problemManager.models import Problem
 from setManager.models import ProblemSet
+from solutionManager.models import Solution
 
 
 def problemSet_page(request, set_id):
     set = ProblemSet.objects.get(id=set_id)
-    return render(request, 'problemSet/problemSet-page.html', {'set': set})
+    problems = set.problems.all()
+
+    problem_and_solutions_by_id = dict()
+
+    for problem in problems:
+        problem_and_solutions_by_id[problem.id] = {'problem': problem, 'solution': None}
+
+    total_score = 0
+    if request.user.is_authenticated:
+        solutions = Solution.objects.filter(problem__problem_set=set, account=request.user.account)
+        for solution in solutions:
+            problem_and_solution = problem_and_solutions_by_id[solution.problem.id]
+            problem_and_solution['solution'] = solution
+            total_score += solution.score
+
+    problem_and_solutions = problem_and_solutions_by_id.values()
+
+    return render(request, 'problemSet/problemSet-page.html',
+                  {'set': set, 'problem_and_solutions': problem_and_solutions, 'total_score': total_score,
+                   'top_accounts': set.get_top_accounts()})
 
 
 @login_required

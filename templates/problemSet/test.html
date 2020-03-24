@@ -1,10 +1,230 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+{% extends 'home/home-base.html' %}
+
+{% block home-head %}
+
     <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard Admin Template by Tooplate.com</title>
+
+    <style>
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            box-sizing: border-box;
+            z-index: 1;
+            padding: 30px;
+        }
+
+        .container * {
+            box-sizing: border-box;
+        }
+
+        .bg-white {
+            background-color: #ffffffbf;
+            border-radius: 3px;
+            border: solid 2px #14149a;
+        }
+
+        .h-100 {
+            height: 100% !important;
+        }
+
+        .tm-mt-small > .col-12 > p {
+            background-color: #0000007a;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+        }
+
+
+        .tm-bg-black {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .tm-mt-big {
+            margin-top: 70px;
+        }
+
+        .tm-mt-small {
+            margin-top: 20px;
+        }
+
+        .tm-block {
+            padding: 50px 45px;
+        }
+
+        .navbar-light .navbar-nav a:hover {
+            background-color: #e6e6e6;
+        }
+
+        .tm-content-row {
+            justify-content: space-between;
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+
+        .tm-col {
+            padding-left: 20px;
+            padding-right: 20px;
+            margin-bottom: 50px;
+        }
+
+        .tm-col-big {
+            width: 39%;
+        }
+
+        .tm-col-small {
+            width: 21.95%;
+        }
+
+
+        .tm-list-group > li {
+            list-style-type: none;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+        }
+
+        .tm-list-group-pad-big > li {
+            padding: 20px;
+        }
+
+        .tm-list-group > li:hover {
+            color: #0266c4;
+        }
+
+        .tm-list-group-alternate-color > li:nth-child(odd) {
+            background-color: #e6e6e6;
+        }
+
+        .tm-list-group > li:before {
+            counter-increment: myOrderedListItemsCounter;
+            content: counter(myOrderedListItemsCounter) ".";
+            margin-right: 0.5em;
+        }
+
+        .tm-list > li {
+            margin-bottom: 20px;
+        }
+
+        .table td,
+        .table th {
+            padding: 20px 24px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: white;
+            color: #3aabd0;
+        }
+
+
+        .tm-table-striped-even.table-striped tbody tr:nth-of-type(even) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .tm-table-striped-even.table-striped tbody tr:nth-of-type(odd) {
+            background-color: white;
+        }
+
+
+        footer {
+            margin-bottom: 35px;
+        }
+
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1630px;
+            }
+        }
+
+
+        @media (max-width: 1199px) {
+            .tm-col-big,
+            .tm-col-small {
+                width: 49.65%;
+            }
+
+        }
+
+        @media (max-width: 991px) {
+            .tm-col-big,
+            .tm-col-small {
+                width: 100%;
+                min-height: 383px;
+                height: auto;
+            }
+
+            .tm-block {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tm-mt-big {
+                margin-top: 45px;
+            }
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block home-body %}
+    <div class="container">
+        <div class="row tm-content-row tm-mt-big">
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    1
+                </div>
+            </div>
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    2
+                </div>
+            </div>
+            <div class="tm-col tm-col-small">
+                <div class="bg-white tm-block h-100">
+                    3
+                </div>
+            </div>
+
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    4
+                </div>
+            </div>
+            <div class="tm-col tm-col-big">
+                <div class="bg-white tm-block h-100">
+                    5
+                </div>
+            </div>
+            <div class="tm-col tm-col-small">
+                <div class="bg-white tm-block h-100">
+                    6
+                </div>
+            </div>
+
+        </div>
+        <footer class="row tm-mt-small">
+            <div class="col-12">
+                <p class="d-inline-block tm-bg-black text-white py-2 px-4">
+                    BlackGeo
+                </p>
+            </div>
+        </footer>
+    </div>
+{% endblock %}

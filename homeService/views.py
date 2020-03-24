@@ -6,6 +6,9 @@ from setManager.models import ProblemSet
 
 def homePage(request):
     sets = ProblemSet.objects.all()
-    from drawingSolutions.models import DrawingSolution
-    DrawingSolution.objects.all().delete()
+    # ProblemSet.objects.all().delete()
     return render(request, 'home/home.html', {'sets': sets})
+
+
+def test(request):
+    return render(request, 'problemSet/test.html')
